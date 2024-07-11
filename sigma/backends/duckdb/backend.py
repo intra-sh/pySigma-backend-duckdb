@@ -10,12 +10,12 @@ from sigma.processing.pipeline import ProcessingPipeline
 from sigma.rule import SigmaRule
 from sigma.types import SigmaCompareExpression, SigmaRegularExpression, SigmaRegularExpressionFlag, SpecialChars, SigmaString
 
-from ...pipelines.sqlite import sqlite_pipeline
+from ...pipelines.duckdb import duckdb_pipeline
 
 # Documentation: https://sigmahq-pysigma.readthedocs.io/en/latest/Backends.html
 
-class SQLiteBackend(TextQueryBackend):
-    """SQLite backend."""
+class DuckDbBackend(TextQueryBackend):
+    """DuckDB backend."""
 
     def __init__(
         self,
@@ -32,14 +32,14 @@ class SQLiteBackend(TextQueryBackend):
 
     # Operator precedence: tuple of Condition{AND,OR,NOT} in order of precedence.
     # The backend generates grouping if required
-    name : ClassVar[str] = "SQLite Backend"
-    identifier : ClassVar[str] = "sqlite"
+    name : ClassVar[str] = "DuckDB Backend"
+    identifier : ClassVar[str] = "duckdb"
     formats : Dict[str, str] = {
-        "default": "Plain sqlite queries",
+        "default": "Plain queries",
         "json": "Rule and query as json lines",
     }
     requires_pipeline : bool = False
-    backend_processing_pipeline : ClassVar[ProcessingPipeline] = sqlite_pipeline()
+    backend_processing_pipeline : ClassVar[ProcessingPipeline] = duckdb_pipeline()
 
     precedence : ClassVar[Tuple[ConditionItem, ConditionItem, ConditionItem]] = (ConditionNOT, ConditionAND, ConditionOR)
     group_expression : ClassVar[str] = "({expr})"   # Expression for precedence override grouping as format string with {expr} placeholder
@@ -219,11 +219,11 @@ class SQLiteBackend(TextQueryBackend):
             self.escape_char,
             self.wildcard_multi,
             self.wildcard_single,
-            self.add_escaped, # `self.str_quote` was removed from this line; in SQLite, `'` is not escaped in the same way as wildcards
+            self.add_escaped, # `self.str_quote` was removed from this line; in DuckDB, `'` is not escaped in the same way as wildcards
             self.filter_chars,
         )
 
-        # SQLite escapes `'` as `''`
+        # DuckDB escapes `'` as `''`
         converted = converted.replace("'", "''")
 
         return self.quote_string(converted)

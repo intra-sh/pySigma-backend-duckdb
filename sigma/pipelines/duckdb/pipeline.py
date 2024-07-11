@@ -31,15 +31,15 @@ class RuleContainsKeywordCondition(RuleProcessingCondition):
 
         return False
 
-def sqlite_pipeline() -> ProcessingPipeline:
+def duckdb_pipeline() -> ProcessingPipeline:
     return ProcessingPipeline(
-        name="SQLite Pipeline",
+        name="DuckDB Pipeline",
         allowed_backends=frozenset(),
         priority=50,
         items=[
             ProcessingItem(
-                identifier="sqlite_keyword_conditions",
-                transformation=DetectionItemFailureTransformation("Keyword conditions are not supported by the SQLite backend"),
+                identifier="duckdb_keyword_conditions",
+                transformation=DetectionItemFailureTransformation("Keyword conditions are not supported by the DuckDB backend"),
                 rule_conditions=[RuleContainsKeywordCondition()],
             ),
         ],

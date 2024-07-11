@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "pySigma-backend-sqlite"
+name = "pySigma-backend-duckdb"
 version = "0.1.0"
-description = "pySigma sqlite backend"
-authors = ["DenizenB <github@podd.xyz>"]
+description = "pySigma duckdb backend"
+authors = ["Patrik-NTT <patrik.olson@security.ntt>"]
 license = "MIT"
-repository = "https://github.com/DenizenB/pySigma-backend-sqlite"
+repository = "https://github.com/Patrik-NTT/pySigma-backend-duckdb"
 packages = [
     { include = "sigma" }
 ]
