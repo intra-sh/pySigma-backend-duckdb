@@ -26,7 +26,7 @@ def test_duckdb_and_expression(duckdb_backend : DuckDbBackend):
                     fieldB: valueB
                 condition: sel
         """)
-    ) == [f"SELECT * FROM {TABLE_NAME} WHERE fieldA LIKE 'valueA' AND fieldB LIKE 'valueB'"]
+    ) == [f"SELECT * FROM {TABLE_NAME} WHERE fieldA ILIKE 'valueA' AND fieldB ILIKE 'valueB'"]
 
 def test_duckdb_or_expression(duckdb_backend : DuckDbBackend):
     assert duckdb_backend.convert(
@@ -43,7 +43,7 @@ def test_duckdb_or_expression(duckdb_backend : DuckDbBackend):
                     fieldB: valueB
                 condition: 1 of sel*
         """)
-    ) == [f"SELECT * FROM {TABLE_NAME} WHERE fieldA LIKE 'valueA' OR fieldB LIKE 'valueB'"]
+    ) == [f"SELECT * FROM {TABLE_NAME} WHERE fieldA ILIKE 'valueA' OR fieldB ILIKE 'valueB'"]
 
 def test_duckdb_and_or_expression(duckdb_backend : DuckDbBackend):
     assert duckdb_backend.convert(
@@ -63,7 +63,7 @@ def test_duckdb_and_or_expression(duckdb_backend : DuckDbBackend):
                         - valueB2
                 condition: sel
         """)
-    ) == [f"SELECT * FROM {TABLE_NAME} WHERE (fieldA LIKE 'valueA1' OR fieldA LIKE 'valueA2') AND (fieldB LIKE 'valueB1' OR fieldB LIKE 'valueB2')"]
+    ) == [f"SELECT * FROM {TABLE_NAME} WHERE (fieldA ILIKE 'valueA1' OR fieldA ILIKE 'valueA2') AND (fieldB ILIKE 'valueB1' OR fieldB ILIKE 'valueB2')"]
 
 def test_duckdb_or_and_expression(duckdb_backend : DuckDbBackend):
     assert duckdb_backend.convert(
@@ -82,7 +82,7 @@ def test_duckdb_or_and_expression(duckdb_backend : DuckDbBackend):
                     fieldB: valueB2
                 condition: 1 of sel*
         """)
-    ) == [f"SELECT * FROM {TABLE_NAME} WHERE fieldA LIKE 'valueA1' AND fieldB LIKE 'valueB1' OR fieldA LIKE 'valueA2' AND fieldB LIKE 'valueB2'"]
+    ) == [f"SELECT * FROM {TABLE_NAME} WHERE fieldA ILIKE 'valueA1' AND fieldB ILIKE 'valueB1' OR fieldA ILIKE 'valueA2' AND fieldB ILIKE 'valueB2'"]
 
 def test_duckdb_in_expression(duckdb_backend : DuckDbBackend):
     assert duckdb_backend.convert(
@@ -100,7 +100,23 @@ def test_duckdb_in_expression(duckdb_backend : DuckDbBackend):
                         - valueC*
                 condition: sel
         """)
-    ) == [f"SELECT * FROM {TABLE_NAME} WHERE fieldA LIKE 'valueA' OR fieldA LIKE 'valueB' OR fieldA LIKE 'valueC%'"]
+    ) == [f"SELECT * FROM {TABLE_NAME} WHERE fieldA ILIKE 'valueA' OR fieldA ILIKE 'valueB' OR fieldA ILIKE 'valueC%'"]
+
+def test_duckdb_escape_wildcards_in_like_expressions(duckdb_backend : DuckDbBackend):
+    assert duckdb_backend.convert(
+        SigmaCollection.from_yaml("""
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                sel:
+                    fieldA: value_A
+                    fieldB: value%B
+                condition: sel
+        """)
+    ) == [f"SELECT * FROM {TABLE_NAME} WHERE fieldA ILIKE 'value\\_A' ESCAPE '\\' AND fieldB ILIKE 'value\\%B' ESCAPE '\\'"]
 
 def test_duckdb_regex_query(duckdb_backend : DuckDbBackend):
     assert duckdb_backend.convert(
@@ -116,7 +132,7 @@ def test_duckdb_regex_query(duckdb_backend : DuckDbBackend):
                     fieldB: foo
                 condition: sel
         """)
-    ) == [f"SELECT * FROM {TABLE_NAME} WHERE fieldA REGEXP 'foo.*bar' AND fieldB LIKE 'foo'"]
+    ) == [f"SELECT * FROM {TABLE_NAME} WHERE fieldA ~ '(?i)foo.*bar' AND fieldB ILIKE 'foo'"]
 
 def test_duckdb_cidr_query(duckdb_backend : DuckDbBackend):
     assert duckdb_backend.convert(
@@ -131,7 +147,7 @@ def test_duckdb_cidr_query(duckdb_backend : DuckDbBackend):
                     field|cidr: 192.168.0.0/16
                 condition: sel
         """)
-    ) == [f"SELECT * FROM {TABLE_NAME} WHERE field LIKE '192.168.%'"]
+    ) == [f"SELECT * FROM {TABLE_NAME} WHERE field ILIKE '192.168.%'"]
 
 def test_duckdb_field_name_with_whitespace(duckdb_backend : DuckDbBackend):
     assert duckdb_backend.convert(
@@ -146,34 +162,4 @@ def test_duckdb_field_name_with_whitespace(duckdb_backend : DuckDbBackend):
                     field name: value
                 condition: sel
         """)
-    ) == [f"SELECT * FROM {TABLE_NAME} WHERE `field name` LIKE 'value'"]
-
-# TODO: implement tests for all backend features that don't belong to the base class defaults, e.g. features that were
-# implemented with custom code, deferred expressions etc.
-
-def test_duckdb_reversed_endswith_optimization(duckdb_backend: DuckDbBackend):
-    assert duckdb_backend.convert(
-        SigmaCollection.from_yaml("""
-            title: Test
-            status: test
-            logsource:
-                category: test_category
-                product: test_product
-            detection:
-                sel:
-                    fieldA: '*valueA'
-                    fieldB: '*valueB'
-                condition: sel
-        """)
-    ) == [f"SELECT * FROM {TABLE_NAME} WHERE REV(fieldA) LIKE 'Aeulav%' AND fieldB LIKE '%valueB'"]
-
-
-def test_duckdb_format1_output(duckdb_backend : DuckDbBackend):
-    """Test for output format format1."""
-    # TODO: implement a test for the output format
-    pass
-
-def test_duckdb_format2_output(duckdb_backend : DuckDbBackend):
-    """Test for output format format2."""
-    # TODO: implement a test for the output format
-    pass
+    ) == [f"SELECT * FROM {TABLE_NAME} WHERE \"field name\" ILIKE 'value'"]
