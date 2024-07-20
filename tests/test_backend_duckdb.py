@@ -2,7 +2,7 @@ import pytest
 from sigma.collection import SigmaCollection
 from sigma.backends.duckdb import DuckDbBackend
 
-TABLE_NAME = "table"
+TABLE_NAME = "some_table"
 REVERSE_INDEXED_FIELDS = [
     "fieldA"
 ]
@@ -129,10 +129,10 @@ def test_duckdb_regex_query(duckdb_backend : DuckDbBackend):
             detection:
                 sel:
                     fieldA|re: foo.*bar
-                    fieldB: foo
+                    fieldB|re|ignorecase: foo
                 condition: sel
         """)
-    ) == [f"SELECT * FROM {TABLE_NAME} WHERE fieldA ~ '(?i)foo.*bar' AND fieldB ILIKE 'foo'"]
+    ) == [f"SELECT * FROM {TABLE_NAME} WHERE fieldA ~ 'foo.*bar' AND fieldB ~ '(?i)foo'"]
 
 def test_duckdb_cidr_query(duckdb_backend : DuckDbBackend):
     assert duckdb_backend.convert(
