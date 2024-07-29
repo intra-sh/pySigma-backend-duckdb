@@ -97,7 +97,7 @@ class DuckDbBackend(TextQueryBackend):
 
     # Case sensitive string matching expression. String is quoted/escaped like a normal string.
     # Placeholders {field} and {value} are replaced with field name and quoted/escaped string.
-    #case_sensitive_match_expression : ClassVar[str] = "{field} casematch {value}"
+    case_sensitive_match_expression : ClassVar[str] = "{field} LIKE {value}"
     # Case sensitive string matching operators similar to standard string matching. If not provided,
     # case_sensitive_match_expression is used.
     #case_sensitive_startswith_expression : ClassVar[str] = "{field} casematch_startswith {value}"
