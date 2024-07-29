@@ -23,12 +23,20 @@ class DuckDbBackend(TextQueryBackend):
         collect_errors: bool = False,
         table_name : str = "events",
         reverse_indexed_fields : List[str] = [],
+        raw_field : Optional[str] = None,
     ):
         super().__init__(processing_pipeline, collect_errors)
 
         # Backend config
         self.table_name = self.escape_and_quote_field(table_name)
         self.reverse_indexed_fields = reverse_indexed_fields
+
+        if raw_field:
+            raw_field = self.escape_and_quote_field(raw_field)
+
+            self.unbound_value_str_expression : str = self.contains_expression.replace("{field}", raw_field)  # Expression for string value not bound to a field as format string with placeholder {value}
+            self.unbound_value_num_expression : str = raw_field + " contains '{value}'"  # Expression for number value not bound to a field as format string with placeholder {value}
+            self.unbound_value_re_expression : str = self.re_expression.replace("{field}", raw_field).replace("{regex}", "{value}")  # Expression for regular expression not bound to a field as format string with placeholder {value} and {flag_x} as described for re_expression
 
     # Operator precedence: tuple of Condition{AND,OR,NOT} in order of precedence.
     # The backend generates grouping if required
