@@ -7,8 +7,6 @@ This is a DuckDB backend for pySigma. It provides the package `sigma.backends.du
 The backend supports the following backend options (passed with `-O` to `sigma convert`, or as keyword constructor arguments):
 
 * `table_name`: The name of the DuckDB table to search in
-* `raw_field`: The name of the field to apply keyword conditions against (optional)
-* `reverse_indexed_fields`: A list of fields that are indexed in reverse, as an optimization for `endswith` conditions
 
 Further, it contains the following processing pipelines in `sigma.pipelines.duckdb`:
 
