@@ -127,7 +127,7 @@ class DuckDbBackend(TextQueryBackend):
     }
 
     # Expression for comparing two event fields
-    field_equals_field_expression : ClassVar[Optional[str]] = None  # Field comparison expression with the placeholders {field1} and {field2} corresponding to left field and right value side of Sigma detection item
+    field_equals_field_expression : ClassVar[Optional[str]] = "{field1} = {field2}"  # Field comparison expression with the placeholders {field1} and {field2} corresponding to left field and right value side of Sigma detection item
     field_equals_field_escaping_quoting : Tuple[bool, bool] = (True, True)   # If regular field-escaping/quoting is applied to field1 and field2. A custom escaping/quoting can be implemented in the convert_condition_field_eq_field_escape_and_quote method.
 
     # Null/None expressions
