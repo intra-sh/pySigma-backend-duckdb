@@ -34,7 +34,7 @@ class RuleContainsKeywordCondition(RuleProcessingCondition):
 def duckdb_pipeline() -> ProcessingPipeline:
     return ProcessingPipeline(
         name="DuckDB Pipeline",
-        allowed_backends=frozenset("duckdb"),
+        allowed_backends=frozenset(["duckdb"]),
         priority=50,
         items=[
             ProcessingItem(
