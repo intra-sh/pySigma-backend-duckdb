@@ -162,16 +162,6 @@ class DuckDbBackend(TextQueryBackend):
                 and not value[1:].contains_special()
             )
 
-            # Can we reverse this endswith condition into a startswith condition?
-            # If so, we can make use of an index to speed up the query
-            if is_endswith and field in self.reverse_indexed_fields:
-                # Reverse the field
-                expr = expr.replace("{field}", "REV({field})")
-
-                # Reverse the value
-                value.s = tuple(reversed(tuple(value)))
-                value._merge_strs()
-
             # Are there any escaped wildcards in the value?
             if "%" in value or "_" in value:
                 # Specify `\` as an escape character for `_` and `%` in this LIKE condition
