@@ -13,6 +13,9 @@ from sigma.rule import SigmaRule, SigmaDetection, SigmaDetectionItem
 
 class RuleContainsKeywordCondition(RuleProcessingCondition):
     def match(self, pipeline : "sigma.processing.pipeline.ProcessingPipeline", rule : SigmaRule) -> bool:
+        if not rule.detection:
+            return False
+
         for detection in rule.detection.detections.values():
             if self.find_detection_item(detection):
                 return True
