@@ -3,13 +3,10 @@ from sigma.collection import SigmaCollection
 from sigma.backends.duckdb import DuckDbBackend
 
 TABLE_NAME = "some_table"
-REVERSE_INDEXED_FIELDS = [
-    "fieldA"
-]
 
 @pytest.fixture
 def duckdb_backend():
-    return DuckDbBackend(table_name=TABLE_NAME, reverse_indexed_fields=REVERSE_INDEXED_FIELDS)
+    return DuckDbBackend(table_name=TABLE_NAME)
 
 # TODO: implement tests for some basic queries and their expected results.
 def test_duckdb_and_expression(duckdb_backend : DuckDbBackend):
